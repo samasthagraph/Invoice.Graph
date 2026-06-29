@@ -39,6 +39,7 @@ export default function DocumentDetail() {
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [converting, setConverting] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -143,6 +144,39 @@ export default function DocumentDetail() {
     }
   };
 
+  const handleConvertToInvoice = async () => {
+    if (!invoice || !settings) return;
+    try {
+      setConverting(true);
+      
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      const year = new Date().getFullYear();
+      const newDocNumber = `INV-${year}-${randomNum}`;
+      
+      const updatedDoc = {
+        ...invoice,
+        document_type: 'invoice' as const,
+        document_number: newDocNumber,
+        status: 'draft' as const,
+        items: invoice.items || []
+      };
+      
+      await db.updateInvoice(invoice.id, updatedDoc as any);
+      setInvoice({
+        ...invoice,
+        document_type: 'invoice',
+        document_number: newDocNumber,
+        status: 'draft'
+      });
+      alert(`Quotation successfully converted to Invoice: ${newDocNumber}`);
+    } catch (err: any) {
+      console.error('Failed to convert quotation to invoice:', err);
+      alert('Failed to convert: ' + (err?.message || err));
+    } finally {
+      setConverting(false);
+    }
+  };
+
   if (loading || !invoice || !settings) {
     return (
       <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
@@ -225,6 +259,18 @@ export default function DocumentDetail() {
               </>
             )}
           </div>
+
+          {/* Convert to Invoice Button */}
+          {!isInvoice && (
+            <button
+              onClick={handleConvertToInvoice}
+              disabled={converting}
+              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 cursor-pointer disabled:cursor-wait"
+            >
+              <Sparkles className="h-4 w-4 mr-1.5" />
+              {converting ? 'Converting...' : 'Convert to Invoice'}
+            </button>
+          )}
 
           {/* Edit Button */}
           <Link
