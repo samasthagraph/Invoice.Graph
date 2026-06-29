@@ -76,7 +76,11 @@ export default function CreateDocument() {
       return;
     }
     
-    // Ensure descriptions are entered
+    if (!formData.document_number) {
+      alert('Please enter a document number.');
+      return;
+    }
+
     const emptyItems = formData.items.some(item => !item.description.trim());
     if (emptyItems) {
       alert('Please fill out descriptions for all line items.');
