@@ -57,6 +57,7 @@ export async function GET(
       tax_total: Number(row.tax_total),
       discount_total: Number(row.discount_total),
       grand_total: Number(row.grand_total),
+      advance_payment: Number(row.advance_payment || 0),
       project_description: row.project_description,
       notes: row.notes,
       created_at: row.created_at,
@@ -101,6 +102,7 @@ export async function PUT(
         tax_total = ${body.tax_total},
         discount_total = ${body.discount_total},
         grand_total = ${body.grand_total},
+        advance_payment = ${Number(body.advance_payment || 0)},
         project_description = ${body.project_description},
         notes = ${body.notes}
       WHERE id = ${id}
@@ -160,6 +162,7 @@ export async function PUT(
       tax_total: Number(updatedInvoice.tax_total),
       discount_total: Number(updatedInvoice.discount_total),
       grand_total: Number(updatedInvoice.grand_total),
+      advance_payment: Number(updatedInvoice.advance_payment || 0),
       items: insertedItems
     });
   } catch (err: any) {

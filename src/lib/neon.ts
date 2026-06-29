@@ -38,6 +38,7 @@ export async function runAutoMigrations() {
         tax_total NUMERIC(12,2) NOT NULL DEFAULT 0.00,
         discount_total NUMERIC(12,2) NOT NULL DEFAULT 0.00,
         grand_total NUMERIC(12,2) NOT NULL DEFAULT 0.00,
+        advance_payment NUMERIC(12,2) NOT NULL DEFAULT 0.00,
         project_description TEXT,
         notes TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
@@ -78,6 +79,7 @@ export async function runAutoMigrations() {
 
     // 5. Run column sync migrations for existing databases
     await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS project_description TEXT;`;
+    await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS advance_payment NUMERIC(12,2) NOT NULL DEFAULT 0.00;`;
     
     console.log('Neon DB auto-migrations executed successfully.');
   } catch (err) {

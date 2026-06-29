@@ -178,12 +178,26 @@ export default function InvoicePreview({ formData, settings, selectedClient }: I
                   <span>{formatCurrency(formData.tax_total)}</span>
                 </div>
               )}
+              {(formData.advance_payment || 0) > 0 && (
+                <div className="flex justify-between text-emerald-600 font-bold">
+                  <span>Advance Paid:</span>
+                  <span>-{formatCurrency(formData.advance_payment || 0)}</span>
+                </div>
+              )}
               <div className={`flex justify-between p-3 rounded-xl font-extrabold text-sm ${
-                isInvoice ? 'bg-indigo-50 text-indigo-900 border border-indigo-100/50' : 'bg-amber-50 text-amber-900 border border-amber-100/50'
+                isInvoice ? 'bg-indigo-50 text-indigo-900 border border-indigo-100/30' : 'bg-amber-50 text-amber-900 border border-amber-100/30'
               }`}>
                 <span>Grand Total:</span>
                 <span>{formatCurrency(formData.grand_total)}</span>
               </div>
+              {(formData.advance_payment || 0) > 0 && (
+                <div className={`flex justify-between p-3 rounded-xl font-extrabold text-sm ${
+                  isInvoice ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' : 'bg-amber-600 text-white shadow-md shadow-amber-600/10'
+                }`}>
+                  <span>Balance Due:</span>
+                  <span>{formatCurrency(formData.grand_total - (formData.advance_payment || 0))}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

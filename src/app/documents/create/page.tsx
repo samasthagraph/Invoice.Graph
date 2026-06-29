@@ -28,6 +28,7 @@ export default function CreateDocument() {
     tax_total: 0,
     discount_total: 0,
     grand_total: 0,
+    advance_payment: 0,
     project_description: '',
     notes: '1. Please pay within 30 days.\n2. Bank Account details listed below.',
     items: [

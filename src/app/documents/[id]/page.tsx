@@ -101,8 +101,12 @@ export default function DocumentDetail() {
       const docTypeLabel = isInvoice ? 'Invoice' : 'Quotation';
       const clientName = invoice.client?.company_name || invoice.client?.name || 'Client';
       
+      const balanceDue = Number(invoice.grand_total) - Number(invoice.advance_payment || 0);
       const shareText = `Here is ${docTypeLabel} ${invoice.document_number} for ${clientName}.\n` +
         `Grand Total: Rs. ${Number(invoice.grand_total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}\n` +
+        (Number(invoice.advance_payment || 0) > 0 
+          ? `Balance Due: Rs. ${balanceDue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}\n`
+          : '') +
         `Due Date: ${new Date(invoice.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}`;
 
       // 1. Try to compile PDF and use Web Share API if supported

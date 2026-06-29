@@ -36,6 +36,7 @@ export interface Invoice {
   tax_total: number;
   discount_total: number;
   grand_total: number;
+  advance_payment?: number;
   project_description?: string | null;
   notes?: string | null;
   created_at?: string;

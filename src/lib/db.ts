@@ -321,6 +321,7 @@ export const db = {
           tax_total: invoice.tax_total,
           discount_total: invoice.discount_total,
           grand_total: invoice.grand_total,
+          advance_payment: invoice.advance_payment || 0,
           project_description: invoice.project_description,
           notes: invoice.notes
         })
@@ -399,6 +400,7 @@ export const db = {
           tax_total: invoice.tax_total,
           discount_total: invoice.discount_total,
           grand_total: invoice.grand_total,
+          advance_payment: invoice.advance_payment || 0,
           project_description: invoice.project_description,
           notes: invoice.notes
         })

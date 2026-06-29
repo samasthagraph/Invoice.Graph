@@ -32,6 +32,7 @@ export async function GET() {
       tax_total: Number(row.tax_total),
       discount_total: Number(row.discount_total),
       grand_total: Number(row.grand_total),
+      advance_payment: Number(row.advance_payment || 0),
       project_description: row.project_description,
       notes: row.notes,
       created_at: row.created_at,
@@ -70,6 +71,7 @@ export async function POST(req: Request) {
         tax_total, 
         discount_total, 
         grand_total, 
+        advance_payment,
         project_description, 
         notes
       )
@@ -84,6 +86,7 @@ export async function POST(req: Request) {
         ${body.tax_total}, 
         ${body.discount_total}, 
         ${body.grand_total}, 
+        ${Number(body.advance_payment || 0)},
         ${body.project_description}, 
         ${body.notes}
       )
@@ -134,6 +137,7 @@ export async function POST(req: Request) {
       tax_total: Number(newInvoice.tax_total),
       discount_total: Number(newInvoice.discount_total),
       grand_total: Number(newInvoice.grand_total),
+      advance_payment: Number(newInvoice.advance_payment || 0),
       items: insertedItems
     });
   } catch (err: any) {

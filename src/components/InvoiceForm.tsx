@@ -407,6 +407,39 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
         </div>
       </div>
 
+      {/* 4.5 Advance Payment / Deposit */}
+      <div className="border-t border-slate-100 pt-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Advance Payment (Paid Amount)</label>
+            <div className="relative rounded-lg shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span className="text-slate-400 text-sm">Rs.</span>
+              </div>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                value={formData.advance_payment || ''}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value) || 0;
+                  setFormData((prev: any) => ({ ...prev, advance_payment: val }));
+                }}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2 text-sm text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+              />
+            </div>
+            <p className="text-[10px] text-slate-400 mt-1">If client has made a partial deposit or advance, enter it here to calculate Balance Due.</p>
+          </div>
+          <div className="flex flex-col justify-center md:items-end">
+            <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">Grand Total: Rs. {Number(formData.grand_total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+            <div className="text-lg text-emerald-600 font-extrabold mt-1">
+              Balance Due: Rs. {Number((formData.grand_total || 0) - (formData.advance_payment || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 5. Notes & Terms */}
       <div className="border-t border-slate-100 pt-5">
         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Notes & Payment Instructions</label>

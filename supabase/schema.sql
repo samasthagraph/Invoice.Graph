@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     tax_total NUMERIC(12,2) NOT NULL DEFAULT 0.00,
     discount_total NUMERIC(12,2) NOT NULL DEFAULT 0.00,
     grand_total NUMERIC(12,2) NOT NULL DEFAULT 0.00,
+    advance_payment NUMERIC(12,2) NOT NULL DEFAULT 0.00,
     project_description TEXT,
     notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL

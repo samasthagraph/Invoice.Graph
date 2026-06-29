@@ -31,6 +31,7 @@ export default function EditDocument() {
     tax_total: 0,
     discount_total: 0,
     grand_total: 0,
+    advance_payment: 0,
     project_description: '',
     notes: '',
     items: [
@@ -65,6 +66,7 @@ export default function EditDocument() {
           tax_total: Number(doc.tax_total),
           discount_total: Number(doc.discount_total),
           grand_total: Number(doc.grand_total),
+          advance_payment: Number(doc.advance_payment || 0),
           project_description: doc.project_description || '',
           notes: doc.notes || '',
           items: doc.items ? doc.items.map(item => ({

@@ -404,6 +404,12 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
                 <Text>{formatPDFCurrency(invoice.tax_total)}</Text>
               </View>
             )}
+            {invoice.advance_payment && Number(invoice.advance_payment) > 0 ? (
+              <View style={[styles.summaryRow, { color: '#10b981', fontWeight: 'bold' }]}>
+                <Text>Advance Paid:</Text>
+                <Text>-{formatPDFCurrency(invoice.advance_payment)}</Text>
+              </View>
+            ) : null}
             <View style={[
               styles.grandTotalBlock,
               { 
@@ -414,6 +420,19 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
               <Text>Grand Total:</Text>
               <Text>{formatPDFCurrency(invoice.grand_total)}</Text>
             </View>
+            {invoice.advance_payment && Number(invoice.advance_payment) > 0 ? (
+              <View style={[
+                styles.grandTotalBlock,
+                { 
+                  backgroundColor: isInvoice ? '#4f46e5' : '#b45309',
+                  color: '#ffffff',
+                  marginTop: 4
+                }
+              ]}>
+                <Text>Balance Due:</Text>
+                <Text>{formatPDFCurrency(invoice.grand_total - invoice.advance_payment)}</Text>
+              </View>
+            ) : null}
           </View>
         </View>
 
