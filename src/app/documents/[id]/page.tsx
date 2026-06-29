@@ -38,6 +38,7 @@ export default function DocumentDetail() {
   const [isClient, setIsClient] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -90,6 +91,52 @@ export default function DocumentDetail() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleWhatsAppShare = async () => {
+    if (!invoice || !settings) return;
+    try {
+      setSharing(true);
+      const isInvoice = invoice.document_type === 'invoice';
+      const docTypeLabel = isInvoice ? 'Invoice' : 'Quotation';
+      const clientName = invoice.client?.company_name || invoice.client?.name || 'Client';
+      
+      const shareText = `Here is ${docTypeLabel} ${invoice.document_number} for ${clientName}.\n` +
+        `Grand Total: Rs. ${Number(invoice.grand_total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}\n` +
+        `Due Date: ${new Date(invoice.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}`;
+
+      // 1. Try to compile PDF and use Web Share API if supported
+      if (typeof navigator !== 'undefined' && navigator.canShare) {
+        try {
+          const { pdf } = await import('@react-pdf/renderer');
+          const PDFDocument = (await import('@/components/PDFDocument')).default;
+          
+          const doc = <PDFDocument invoice={invoice} settings={settings} />;
+          const blob = await pdf(doc).toBlob();
+          const file = new File([blob], `${invoice.document_number}.pdf`, { type: 'application/pdf' });
+          
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: `${docTypeLabel} ${invoice.document_number}`,
+              text: shareText
+            });
+            setSharing(false);
+            return;
+          }
+        } catch (shareErr) {
+          console.warn('Native share failed, falling back to WhatsApp Web link:', shareErr);
+        }
+      }
+
+      // 2. Fallback: Prefilled WhatsApp Web/App Text Link
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+      window.open(waUrl, '_blank');
+    } catch (err) {
+      console.error('Failed to share to WhatsApp:', err);
+    } finally {
+      setSharing(false);
+    }
   };
 
   if (loading || !invoice || !settings) {
@@ -184,6 +231,20 @@ export default function DocumentDetail() {
             Edit Document
           </Link>
 
+          {/* WhatsApp Share Button */}
+          <button
+            onClick={handleWhatsAppShare}
+            disabled={sharing}
+            className="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-600/60 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-emerald-600/10 hover:shadow-emerald-600/20 cursor-pointer disabled:cursor-wait"
+          >
+            {sharing ? (
+              <span className="h-4 w-4 mr-1.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <WhatsAppIcon className="h-4 w-4 mr-1.5 fill-white" />
+            )}
+            {sharing ? 'Compiling...' : 'Share to WhatsApp'}
+          </button>
+
           {/* Print Button */}
           <button
             onClick={handlePrint}
@@ -231,3 +292,9 @@ export default function DocumentDetail() {
     </div>
   );
 }
+
+const WhatsAppIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.249 8.477 3.518 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.5-5.729-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.59 1.966 14.12 .949 11.49 .949c-5.437 0-9.862 4.371-9.866 9.8c-.001 1.77.463 3.5 1.34 5.044l-.949 3.468 3.553-.931zm10.915-4.88c-.285-.143-1.688-.832-1.948-.928-.26-.096-.45-.143-.64.143-.19.285-.733.928-.9 1.12-.167.193-.335.215-.62.072-.285-.143-1.204-.444-2.293-1.415-.848-.756-1.42-1.69-1.587-1.975-.167-.285-.018-.439.125-.58.128-.127.285-.335.428-.5.143-.167.19-.285.285-.473.095-.19.047-.355-.024-.5-.071-.143-.64-1.543-.877-2.112-.23-.553-.464-.477-.64-.486-.165-.008-.354-.01-.543-.01-.19 0-.5.07-.762.354-.26.285-.992.97-1.01 2.373-.017 1.4.996 2.76 1.135 2.95.14.19 2.015 3.077 4.88 4.316.682.295 1.215.47 1.63.602.685.218 1.31.187 1.803.114.549-.08 1.688-.69 1.927-1.357.24-.667.24-1.238.168-1.357-.071-.12-.26-.19-.545-.332z" />
+  </svg>
+);
