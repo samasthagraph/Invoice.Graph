@@ -75,6 +75,10 @@ export async function runAutoMigrations() {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
       );
     `;
+
+    // 5. Run column sync migrations for existing databases
+    await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS project_description TEXT;`;
+    
     console.log('Neon DB auto-migrations executed successfully.');
   } catch (err) {
     console.error('Neon DB migration failed:', err);
