@@ -110,9 +110,9 @@ export default function EditDocument() {
 
       // Redirect to detail page
       router.push(`/documents/${id}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to update document', err);
-      alert('Failed to update document. Please check your inputs or database.');
+      alert('Failed to update document: ' + (err?.message || err || 'Please check your inputs or database.'));
     } finally {
       setIsSaving(false);
     }

@@ -96,9 +96,9 @@ export default function CreateDocument() {
 
       // Redirect to detail page
       router.push(`/documents/${savedDoc.id}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save document', err);
-      alert('Failed to save document. Please check your inputs or database.');
+      alert('Failed to save document: ' + (err?.message || err || 'Please check your inputs or database.'));
     } finally {
       setIsSaving(false);
     }
