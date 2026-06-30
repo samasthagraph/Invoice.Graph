@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Sliders, Database, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import InvoiceForm from '@/components/InvoiceForm';
@@ -9,18 +9,26 @@ import InvoicePreview from '@/components/InvoicePreview';
 import { db } from '@/lib/db';
 import { Client, CompanySettings, InvoiceStatus } from '@/types';
 
-export default function CreateDocument() {
+function CreateDocumentContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [settings, setSettings] = useState<CompanySettings | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
 
+  // Query parameters pre-population
+  const clientIdParam = searchParams.get('client_id') || '';
+  const rentalIdParam = searchParams.get('rental_id') || '';
+  const descParam = searchParams.get('description') || '';
+  const qtyParam = Number(searchParams.get('quantity')) || 1;
+  const priceParam = Number(searchParams.get('unit_price')) || 0;
+
   // Initial Form State
   const [formData, setFormData] = useState({
     document_type: 'invoice',
     document_number: '',
-    client_id: '',
+    client_id: clientIdParam,
     issue_date: new Date().toISOString().split('T')[0],
     due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     status: 'draft',
@@ -29,9 +37,18 @@ export default function CreateDocument() {
     discount_total: 0,
     grand_total: 0,
     advance_payment: 0,
-    project_description: '',
+    project_description: rentalIdParam ? 'Rental Bill' : '',
     notes: '1. Please pay within 30 days.\n2. Bank Account details listed below.',
-    items: [
+    items: descParam ? [
+      {
+        description: descParam,
+        quantity: qtyParam,
+        unit_price: priceParam,
+        tax_rate: 18,
+        discount_rate: 0,
+        total: Number((qtyParam * priceParam * 1.18).toFixed(2))
+      }
+    ] : [
       { description: '', quantity: 1, unit_price: 0, tax_rate: 18, discount_rate: 0, total: 0 }
     ]
   });
@@ -43,7 +60,6 @@ export default function CreateDocument() {
         setLoading(true);
         const compSettings = await db.getSettings();
         const clientList = await db.getClients();
-        const allInvoices = await db.getInvoices();
 
         setSettings(compSettings);
         setClients(clientList);
@@ -56,7 +72,9 @@ export default function CreateDocument() {
 
         setFormData(prev => ({
           ...prev,
-          document_number: docNumber
+          document_number: docNumber,
+          // Prepopulate client_id if we didn't have it at state initialization but got it now
+          client_id: prev.client_id || clientIdParam
         }));
       } catch (err) {
         console.error('Failed to initialize page data', err);
@@ -65,7 +83,7 @@ export default function CreateDocument() {
       }
     }
     init();
-  }, [formData.document_type]);
+  }, [formData.document_type, clientIdParam]);
 
   // Find selected client details for live preview
   const selectedClient = clients.find(c => c.id === formData.client_id);
@@ -94,6 +112,17 @@ export default function CreateDocument() {
         ...formData,
         status
       } as any);
+
+      // If associated with a rental record, update the rental record to link this invoice
+      if (rentalIdParam) {
+        try {
+          await db.updateRentalRecord(rentalIdParam, {
+            invoice_id: savedDoc.id
+          });
+        } catch (rentalErr) {
+          console.error('Failed to link rental record to invoice:', rentalErr);
+        }
+      }
 
       // Redirect to detail page
       router.push(`/documents/${savedDoc.id}`);
@@ -178,5 +207,20 @@ export default function CreateDocument() {
 
       </div>
     </div>
+  );
+}
+
+export default function CreateDocument() {
+  return (
+    <Suspense fallback={
+      <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+          <p className="text-slate-500 font-medium text-sm">Loading Billing Canvas...</p>
+        </div>
+      </div>
+    }>
+      <CreateDocumentContent />
+    </Suspense>
   );
 }

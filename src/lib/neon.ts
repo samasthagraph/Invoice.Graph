@@ -77,7 +77,37 @@ export async function runAutoMigrations() {
       );
     `;
 
-    // 5. Run column sync migrations for existing databases
+    // 5. Create assets table
+    await sql`
+      CREATE TABLE IF NOT EXISTS assets (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name TEXT NOT NULL,
+        description TEXT,
+        serial_number TEXT,
+        rental_rate NUMERIC(12,2) NOT NULL DEFAULT 0.00,
+        status TEXT NOT NULL DEFAULT 'available',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+      );
+    `;
+
+    // 6. Create rental_records table
+    await sql`
+      CREATE TABLE IF NOT EXISTS rental_records (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        asset_id UUID REFERENCES assets(id) ON DELETE CASCADE NOT NULL,
+        client_id UUID REFERENCES clients(id) ON DELETE RESTRICT NOT NULL,
+        checkout_date DATE NOT NULL,
+        expected_return_date DATE,
+        actual_return_date DATE,
+        rental_rate_at_checkout NUMERIC(12,2) NOT NULL,
+        status TEXT NOT NULL DEFAULT 'rented',
+        notes TEXT,
+        invoice_id UUID REFERENCES invoices(id) ON DELETE SET NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+      );
+    `;
+
+    // 7. Run column sync migrations for existing databases
     await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS project_description TEXT;`;
     await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS advance_payment NUMERIC(12,2) NOT NULL DEFAULT 0.00;`;
     

@@ -55,3 +55,33 @@ export interface CompanySettings {
   bank_account_no?: string | null;
   bank_ifsc?: string | null; // or IBAN / Routing Code
 }
+
+export type AssetStatus = 'available' | 'rented' | 'maintenance';
+export type RentalStatus = 'rented' | 'returned' | 'overdue';
+
+export interface Asset {
+  id: string;
+  name: string;
+  description?: string | null;
+  serial_number?: string | null;
+  rental_rate: number;
+  status: AssetStatus;
+  created_at?: string;
+}
+
+export interface RentalRecord {
+  id: string;
+  asset_id: string;
+  asset?: Asset;
+  client_id: string;
+  client?: Client;
+  checkout_date: string;
+  expected_return_date?: string | null;
+  actual_return_date?: string | null;
+  rental_rate_at_checkout: number;
+  status: RentalStatus;
+  notes?: string | null;
+  invoice_id?: string | null;
+  invoice?: Invoice | null;
+  created_at?: string;
+}

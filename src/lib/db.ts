@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import { Client, Invoice, InvoiceItem, CompanySettings, InvoiceStatus } from '@/types';
+import { Client, Invoice, InvoiceItem, CompanySettings, InvoiceStatus, Asset, RentalRecord, AssetStatus, RentalStatus } from '@/types';
 
 const usePostgres = typeof window !== 'undefined' && process.env.NEXT_PUBLIC_USE_POSTGRES === 'true';
 
@@ -117,6 +117,38 @@ const DEFAULT_INVOICES: Invoice[] = [
   }
 ];
 
+const DEFAULT_ASSETS: Asset[] = [
+  {
+    id: 'a1',
+    name: 'Caterpillar Excavator 320',
+    description: 'Medium crawler excavator with 1.2 cubic meter bucket capacity.',
+    serial_number: 'CAT320-8891',
+    rental_rate: 250.00,
+    status: 'available',
+    created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'a2',
+    name: 'Industrial Diesel Generator 100kVA',
+    description: 'Super silent soundproof diesel canopy generator.',
+    serial_number: 'GEN-5542',
+    rental_rate: 120.00,
+    status: 'available',
+    created_at: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'a3',
+    name: 'Scaffolding Tower Set (Aluminum)',
+    description: 'Double width tower set with height extension up to 8 meters.',
+    serial_number: 'SCAF-01',
+    rental_rate: 35.00,
+    status: 'available',
+    created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  }
+];
+
+const DEFAULT_RENTALS: RentalRecord[] = [];
+
 // Helper to initialize local storage data if empty
 function initializeLocalStorage() {
   if (typeof window === 'undefined') return;
@@ -129,6 +161,12 @@ function initializeLocalStorage() {
   }
   if (!localStorage.getItem('invoice_generator_invoices')) {
     localStorage.setItem('invoice_generator_invoices', JSON.stringify(DEFAULT_INVOICES));
+  }
+  if (!localStorage.getItem('invoice_generator_assets')) {
+    localStorage.setItem('invoice_generator_assets', JSON.stringify(DEFAULT_ASSETS));
+  }
+  if (!localStorage.getItem('invoice_generator_rental_records')) {
+    localStorage.setItem('invoice_generator_rental_records', JSON.stringify(DEFAULT_RENTALS));
   }
 }
 
@@ -596,6 +634,235 @@ export const db = {
       };
       setLocalData('invoice_generator_settings', updatedSettings);
       return updatedSettings;
+    }
+  },
+
+  // ==========================================
+  // ASSETS
+  // ==========================================
+  async getAssets(): Promise<Asset[]> {
+    if (usePostgres) {
+      return fetchAPI('/api/assets');
+    }
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('assets')
+        .select('*')
+        .order('name');
+      if (error) throw error;
+      return data || [];
+    } else {
+      return getLocalData<Asset[]>('invoice_generator_assets');
+    }
+  },
+
+  async saveAsset(asset: Omit<Asset, 'id' | 'created_at'>): Promise<Asset> {
+    if (usePostgres) {
+      return fetchAPI('/api/assets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(asset)
+      });
+    }
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('assets')
+        .insert(asset)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } else {
+      const assets = getLocalData<Asset[]>('invoice_generator_assets');
+      const newAsset: Asset = {
+        ...asset,
+        id: 'a-' + Math.random().toString(36).substr(2, 9),
+        created_at: new Date().toISOString()
+      };
+      assets.push(newAsset);
+      setLocalData('invoice_generator_assets', assets);
+      return newAsset;
+    }
+  },
+
+  async updateAsset(id: string, assetUpdates: Partial<Asset>): Promise<Asset> {
+    if (usePostgres) {
+      return fetchAPI(`/api/assets/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(assetUpdates)
+      });
+    }
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('assets')
+        .update(assetUpdates)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } else {
+      const assets = getLocalData<Asset[]>('invoice_generator_assets');
+      const index = assets.findIndex(a => a.id === id);
+      if (index === -1) throw new Error('Asset not found');
+      assets[index] = { ...assets[index], ...assetUpdates };
+      setLocalData('invoice_generator_assets', assets);
+      return assets[index];
+    }
+  },
+
+  async deleteAsset(id: string): Promise<void> {
+    if (usePostgres) {
+      return fetchAPI(`/api/assets/${id}`, {
+        method: 'DELETE'
+      });
+    }
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.from('assets').delete().eq('id', id);
+      if (error) throw error;
+    } else {
+      const assets = getLocalData<Asset[]>('invoice_generator_assets');
+      const filtered = assets.filter(a => a.id !== id);
+      setLocalData('invoice_generator_assets', filtered);
+    }
+  },
+
+  // ==========================================
+  // RENTAL RECORDS
+  // ==========================================
+  async getRentalRecords(): Promise<RentalRecord[]> {
+    if (usePostgres) {
+      return fetchAPI('/api/rentals');
+    }
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('rental_records')
+        .select(`
+          *,
+          asset:assets(*),
+          client:clients(*),
+          invoice:invoices(*)
+        `)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    } else {
+      const rentals = getLocalData<RentalRecord[]>('invoice_generator_rental_records');
+      const assets = getLocalData<Asset[]>('invoice_generator_assets');
+      const clients = getLocalData<Client[]>('invoice_generator_clients');
+      const invoices = getLocalData<Invoice[]>('invoice_generator_invoices');
+      return rentals.map(r => ({
+        ...r,
+        asset: assets.find(a => a.id === r.asset_id),
+        client: clients.find(c => c.id === r.client_id),
+        invoice: r.invoice_id ? invoices.find(inv => inv.id === r.invoice_id) : null
+      })).sort((a, b) => new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime());
+    }
+  },
+
+  async saveRentalRecord(rental: Omit<RentalRecord, 'id' | 'created_at'>): Promise<RentalRecord> {
+    if (usePostgres) {
+      return fetchAPI('/api/rentals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rental)
+      });
+    }
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('rental_records')
+        .insert(rental)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } else {
+      const rentals = getLocalData<RentalRecord[]>('invoice_generator_rental_records');
+      const newRental: RentalRecord = {
+        ...rental,
+        id: 'r-' + Math.random().toString(36).substr(2, 9),
+        created_at: new Date().toISOString()
+      };
+      rentals.push(newRental);
+      setLocalData('invoice_generator_rental_records', rentals);
+      
+      // Update asset status to rented
+      const assets = getLocalData<Asset[]>('invoice_generator_assets');
+      const index = assets.findIndex(a => a.id === rental.asset_id);
+      if (index !== -1) {
+        assets[index].status = 'rented';
+        setLocalData('invoice_generator_assets', assets);
+      }
+      
+      return newRental;
+    }
+  },
+
+  async updateRentalRecord(id: string, rentalUpdates: Partial<RentalRecord>): Promise<RentalRecord> {
+    if (usePostgres) {
+      return fetchAPI(`/api/rentals/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rentalUpdates)
+      });
+    }
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('rental_records')
+        .update(rentalUpdates)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } else {
+      const rentals = getLocalData<RentalRecord[]>('invoice_generator_rental_records');
+      const index = rentals.findIndex(r => r.id === id);
+      if (index === -1) throw new Error('Rental record not found');
+      
+      const prevRecord = rentals[index];
+      rentals[index] = { ...prevRecord, ...rentalUpdates };
+      setLocalData('invoice_generator_rental_records', rentals);
+
+      // If checking in, make the asset available
+      if (rentalUpdates.actual_return_date && prevRecord.status !== 'returned') {
+        const assets = getLocalData<Asset[]>('invoice_generator_assets');
+        const assetIndex = assets.findIndex(a => a.id === prevRecord.asset_id);
+        if (assetIndex !== -1) {
+          assets[assetIndex].status = 'available';
+          setLocalData('invoice_generator_assets', assets);
+        }
+      }
+
+      return rentals[index];
+    }
+  },
+
+  async deleteRentalRecord(id: string): Promise<void> {
+    if (usePostgres) {
+      return fetchAPI(`/api/rentals/${id}`, {
+        method: 'DELETE'
+      });
+    }
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.from('rental_records').delete().eq('id', id);
+      if (error) throw error;
+    } else {
+      const rentals = getLocalData<RentalRecord[]>('invoice_generator_rental_records');
+      const record = rentals.find(r => r.id === id);
+      const filtered = rentals.filter(r => r.id !== id);
+      setLocalData('invoice_generator_rental_records', filtered);
+
+      // Reset asset status if it was rented
+      if (record && record.status === 'rented') {
+        const assets = getLocalData<Asset[]>('invoice_generator_assets');
+        const assetIndex = assets.findIndex(a => a.id === record.asset_id);
+        if (assetIndex !== -1) {
+          assets[assetIndex].status = 'available';
+          setLocalData('invoice_generator_assets', assets);
+        }
+      }
     }
   }
 };

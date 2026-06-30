@@ -12,7 +12,8 @@ import {
   CloudOff,
   Menu,
   X,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Boxes
 } from 'lucide-react';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
@@ -36,6 +37,7 @@ export default function Sidebar() {
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Invoices & Quotes', href: '/documents', icon: FileText },
     { name: 'Clients', href: '/clients', icon: Users },
+    { name: 'Assets & Rentals', href: '/assets', icon: Boxes },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 

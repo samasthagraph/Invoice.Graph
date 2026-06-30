@@ -87,3 +87,38 @@ VALUES (
     'SCBL0000123'
 )
 ON CONFLICT (id) DO NOTHING;
+
+-- 5. ASSETS TABLE
+CREATE TABLE IF NOT EXISTS assets (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    description TEXT,
+    serial_number TEXT,
+    rental_rate NUMERIC(12,2) NOT NULL DEFAULT 0.00,
+    status TEXT NOT NULL DEFAULT 'available' CHECK (status IN ('available', 'rented', 'maintenance')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Index for asset search
+CREATE INDEX IF NOT EXISTS idx_assets_name ON assets(name);
+
+-- 6. RENTAL RECORDS TABLE
+CREATE TABLE IF NOT EXISTS rental_records (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    asset_id UUID REFERENCES assets(id) ON DELETE CASCADE NOT NULL,
+    client_id UUID REFERENCES clients(id) ON DELETE RESTRICT NOT NULL,
+    checkout_date DATE NOT NULL,
+    expected_return_date DATE,
+    actual_return_date DATE,
+    rental_rate_at_checkout NUMERIC(12,2) NOT NULL,
+    status TEXT NOT NULL DEFAULT 'rented' CHECK (status IN ('rented', 'returned', 'overdue')),
+    notes TEXT,
+    invoice_id UUID REFERENCES invoices(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Indexes for rentals
+CREATE INDEX IF NOT EXISTS idx_rentals_asset ON rental_records(asset_id);
+CREATE INDEX IF NOT EXISTS idx_rentals_client ON rental_records(client_id);
+CREATE INDEX IF NOT EXISTS idx_rentals_status ON rental_records(status);
+CREATE INDEX IF NOT EXISTS idx_rentals_invoice ON rental_records(invoice_id);
