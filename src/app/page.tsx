@@ -112,10 +112,68 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-          <p className="text-slate-500 font-medium text-sm">Aggregating dashboard analytics...</p>
+      <div className="flex-1 p-6 lg:p-8 space-y-8 bg-slate-50 animate-pulse">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6">
+          <div className="space-y-2">
+            <div className="h-8 bg-slate-200 rounded w-48"></div>
+            <div className="h-4 bg-slate-200 rounded w-80"></div>
+          </div>
+          <div className="h-10 bg-slate-200 rounded-xl w-32"></div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="h-4 bg-slate-200 rounded w-24"></div>
+                <div className="h-10 w-10 bg-slate-200 rounded-xl"></div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-8 bg-slate-200 rounded w-32"></div>
+                <div className="h-3 bg-slate-200 rounded w-40"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Main Sections Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            {/* Table Skeleton */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="h-6 bg-slate-200 rounded w-48 mb-6"></div>
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex justify-between items-center py-3 border-b border-slate-100 last:border-0">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 bg-slate-200 rounded-xl"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-slate-200 rounded w-32"></div>
+                      <div className="h-3 bg-slate-200 rounded w-48"></div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-slate-200 rounded w-16"></div>
+                    <div className="h-3 bg-slate-200 rounded w-24"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Right Column Skeleton */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-6">
+            <div className="h-6 bg-slate-200 rounded w-40"></div>
+            <div className="h-24 bg-slate-200 rounded-2xl"></div>
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex justify-between items-center">
+                  <div className="h-4 bg-slate-200 rounded w-24"></div>
+                  <div className="h-4 bg-slate-200 rounded w-12"></div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );

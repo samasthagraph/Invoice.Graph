@@ -75,10 +75,48 @@ export default function DocumentList() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-          <p className="text-slate-500 font-medium text-sm">Loading billing database...</p>
+      <div className="flex-1 p-6 lg:p-8 space-y-8 bg-slate-50 animate-pulse">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6">
+          <div className="space-y-2">
+            <div className="h-8 bg-slate-200 rounded w-48"></div>
+            <div className="h-4 bg-slate-200 rounded w-80"></div>
+          </div>
+          <div className="h-10 bg-slate-200 rounded-xl w-36"></div>
+        </div>
+
+        {/* Search & Filter bar placeholder */}
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="h-10 bg-slate-100 rounded-lg w-full md:max-w-md"></div>
+          <div className="flex gap-3 w-full md:w-auto">
+            <div className="h-10 bg-slate-100 rounded-lg w-28"></div>
+            <div className="h-10 bg-slate-100 rounded-lg w-28"></div>
+          </div>
+        </div>
+
+        {/* Table Skeleton */}
+        <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm">
+          <div className="px-6 py-4 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
+            <div className="h-4 bg-slate-200 rounded w-32"></div>
+            <div className="h-4 bg-slate-200 rounded w-20"></div>
+          </div>
+          <div className="divide-y divide-slate-100 px-6">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div className="flex items-center space-x-3 flex-1">
+                  <div className="h-10 w-10 bg-slate-200 rounded-xl"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-slate-200 rounded w-28"></div>
+                    <div className="h-3 bg-slate-200 rounded w-48"></div>
+                  </div>
+                </div>
+                <div className="h-4 bg-slate-200 rounded w-20"></div>
+                <div className="h-4 bg-slate-200 rounded w-16"></div>
+                <div className="h-6 bg-slate-200 rounded-full w-16"></div>
+                <div className="h-8 bg-slate-200 rounded-lg w-16"></div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

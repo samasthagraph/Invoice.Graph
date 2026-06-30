@@ -133,10 +133,51 @@ export default function ClientsPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-          <p className="text-slate-500 font-medium text-sm">Accessing client registry...</p>
+      <div className="flex-1 p-6 lg:p-8 space-y-8 bg-slate-50 animate-pulse">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6">
+          <div className="space-y-2">
+            <div className="h-8 bg-slate-200 rounded w-48"></div>
+            <div className="h-4 bg-slate-200 rounded w-80"></div>
+          </div>
+          <div className="h-10 bg-slate-200 rounded-xl w-32"></div>
+        </div>
+
+        {/* Search Placeholder */}
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm">
+          <div className="h-10 bg-slate-100 rounded-lg w-full md:max-w-md"></div>
+        </div>
+
+        {/* Clients Grid Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-6">
+              <div className="flex items-center space-x-3">
+                <div className="h-12 w-12 bg-slate-200 rounded-full"></div>
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 bg-slate-200 rounded w-32"></div>
+                  <div className="h-3 bg-slate-200 rounded w-24"></div>
+                </div>
+              </div>
+              <div className="space-y-3 pt-2 border-t border-slate-100">
+                <div className="flex items-center space-x-2">
+                  <div className="h-4 w-4 bg-slate-200 rounded"></div>
+                  <div className="h-3 bg-slate-200 rounded w-40"></div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="h-4 w-4 bg-slate-200 rounded"></div>
+                  <div className="h-3 bg-slate-200 rounded w-28"></div>
+                </div>
+              </div>
+              <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+                <div className="h-6 bg-slate-200 rounded-full w-20"></div>
+                <div className="flex gap-2">
+                  <div className="h-8 w-8 bg-slate-200 rounded-lg"></div>
+                  <div className="h-8 w-8 bg-slate-200 rounded-lg"></div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
