@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Antigravity Invoice & Quotation Portal",
+  title: "Invoice & Quotation Portal",
   description: "Internal company invoice and quotation generator dashboard.",
 };
 
