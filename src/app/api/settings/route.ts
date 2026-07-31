@@ -43,7 +43,10 @@ export async function POST(req: Request) {
           logo_url = ${body.logo_url},
           bank_name = ${body.bank_name},
           bank_account_no = ${body.bank_account_no},
-          bank_ifsc = ${body.bank_ifsc}
+          bank_ifsc = ${body.bank_ifsc},
+          account_holder = ${body.account_holder},
+          bank_branch = ${body.bank_branch},
+          gpay_number = ${body.gpay_number}
         WHERE id = ${rows[0].id}
         RETURNING *
       `;
@@ -59,7 +62,10 @@ export async function POST(req: Request) {
           logo_url, 
           bank_name, 
           bank_account_no, 
-          bank_ifsc
+          bank_ifsc,
+          account_holder,
+          bank_branch,
+          gpay_number
         )
         VALUES (
           ${body.company_name}, 
@@ -70,7 +76,10 @@ export async function POST(req: Request) {
           ${body.logo_url}, 
           ${body.bank_name}, 
           ${body.bank_account_no}, 
-          ${body.bank_ifsc}
+          ${body.bank_ifsc},
+          ${body.account_holder},
+          ${body.bank_branch},
+          ${body.gpay_number}
         )
         RETURNING *
       `;

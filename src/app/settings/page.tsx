@@ -24,7 +24,10 @@ export default function SettingsPage() {
     logo_url: '',
     bank_name: '',
     bank_account_no: '',
-    bank_ifsc: ''
+    bank_ifsc: '',
+    account_holder: '',
+    bank_branch: '',
+    gpay_number: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -258,7 +261,18 @@ export default function SettingsPage() {
               <CreditCard className="h-5 w-5 mr-2 text-indigo-500" />
               Receiving Bank Account Details
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Account Holder Name</label>
+                <input
+                  type="text"
+                  name="account_holder"
+                  placeholder="e.g. Acme Innovations Ltd"
+                  value={settings.account_holder || ''}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-850 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-semibold"
+                />
+              </div>
               <div>
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Bank Name</label>
                 <input
@@ -287,6 +301,28 @@ export default function SettingsPage() {
                   value={settings.bank_ifsc || ''}
                   onChange={handleChange}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-850 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-bold uppercase"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Branch Name</label>
+                <input
+                  type="text"
+                  name="bank_branch"
+                  placeholder="e.g. Main Branch"
+                  value={settings.bank_branch || ''}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-850 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-semibold"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">GPay Number / UPI ID</label>
+                <input
+                  type="text"
+                  name="gpay_number"
+                  placeholder="e.g. 9876543210@okaxis"
+                  value={settings.gpay_number || ''}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-850 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-semibold"
                 />
               </div>
             </div>

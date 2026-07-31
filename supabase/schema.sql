@@ -70,6 +70,9 @@ CREATE TABLE IF NOT EXISTS company_settings (
     bank_name TEXT,
     bank_account_no TEXT,
     bank_ifsc TEXT, -- or IBAN / BIC
+    account_holder TEXT,
+    bank_branch TEXT,
+    gpay_number TEXT,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

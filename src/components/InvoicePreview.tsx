@@ -217,13 +217,16 @@ export default function InvoicePreview({ formData, settings, selectedClient }: I
 
             {/* Bank details prefill */}
             <div className="sm:text-right">
-              {settings.bank_name && (
+              {(settings.bank_name || settings.gpay_number) && (
                 <>
                   <span className="font-bold uppercase tracking-wider block mb-1 text-slate-400">Payment Account details</span>
                   <div className="text-slate-500 space-y-0.5 font-semibold">
-                    <p>Bank: {settings.bank_name}</p>
-                    <p>A/C: {settings.bank_account_no}</p>
+                    {settings.account_holder && <p>A/C Holder: {settings.account_holder}</p>}
+                    {settings.bank_name && <p>Bank: {settings.bank_name}</p>}
+                    {settings.bank_branch && <p>Branch: {settings.bank_branch}</p>}
+                    {settings.bank_account_no && <p>A/C No: {settings.bank_account_no}</p>}
                     {settings.bank_ifsc && <p>IFSC: {settings.bank_ifsc}</p>}
+                    {settings.gpay_number && <p>GPay / UPI: {settings.gpay_number}</p>}
                   </div>
                 </>
               )}

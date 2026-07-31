@@ -54,6 +54,9 @@ export interface CompanySettings {
   bank_name?: string | null;
   bank_account_no?: string | null;
   bank_ifsc?: string | null; // or IBAN / Routing Code
+  account_holder?: string | null;
+  bank_branch?: string | null;
+  gpay_number?: string | null;
 }
 
 export type AssetStatus = 'available' | 'rented' | 'maintenance';

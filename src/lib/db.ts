@@ -25,7 +25,10 @@ const DEFAULT_SETTINGS: CompanySettings = {
   tax_id: 'GSTIN1234567890',
   bank_name: 'Standard Chartered Bank',
   bank_account_no: '987654321098',
-  bank_ifsc: 'SCBL0000123'
+  bank_ifsc: 'SCBL0000123',
+  account_holder: 'Acme Innovations Ltd',
+  bank_branch: 'Tech City Main',
+  gpay_number: '9876543210'
 };
 
 const DEFAULT_CLIENTS: Client[] = [

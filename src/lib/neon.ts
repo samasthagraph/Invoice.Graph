@@ -73,6 +73,9 @@ export async function runAutoMigrations() {
         bank_name TEXT,
         bank_account_no TEXT,
         bank_ifsc TEXT,
+        account_holder TEXT,
+        bank_branch TEXT,
+        gpay_number TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
       );
     `;
@@ -110,6 +113,9 @@ export async function runAutoMigrations() {
     // 7. Run column sync migrations for existing databases
     await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS project_description TEXT;`;
     await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS advance_payment NUMERIC(12,2) NOT NULL DEFAULT 0.00;`;
+    await sql`ALTER TABLE company_settings ADD COLUMN IF NOT EXISTS account_holder TEXT;`;
+    await sql`ALTER TABLE company_settings ADD COLUMN IF NOT EXISTS bank_branch TEXT;`;
+    await sql`ALTER TABLE company_settings ADD COLUMN IF NOT EXISTS gpay_number TEXT;`;
     
     console.log('Neon DB auto-migrations executed successfully.');
   } catch (err) {

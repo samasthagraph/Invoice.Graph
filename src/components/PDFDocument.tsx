@@ -451,12 +451,15 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
 
             {/* Bank details column */}
             <View style={[styles.termsCol, { alignItems: 'flex-end', textAlign: 'right' }]}>
-              {settings.bank_name ? (
+              {settings.bank_name || settings.gpay_number ? (
                 <View>
                   <Text style={styles.bankTitle}>Payment Account Details</Text>
-                  <Text style={{ color: '#64748b', fontWeight: 'bold' }}>Bank: {settings.bank_name}</Text>
-                  <Text style={{ color: '#64748b' }}>Account: {settings.bank_account_no}</Text>
-                  {settings.bank_ifsc && <Text style={{ color: '#64748b' }}>IFSC Code: {settings.bank_ifsc}</Text>}
+                  {settings.account_holder && <Text style={{ color: '#64748b' }}>Holder: {settings.account_holder}</Text>}
+                  {settings.bank_name && <Text style={{ color: '#64748b', fontWeight: 'bold' }}>Bank: {settings.bank_name}</Text>}
+                  {settings.bank_branch && <Text style={{ color: '#64748b' }}>Branch: {settings.bank_branch}</Text>}
+                  {settings.bank_account_no && <Text style={{ color: '#64748b' }}>Account: {settings.bank_account_no}</Text>}
+                  {settings.bank_ifsc && <Text style={{ color: '#64748b' }}>IFSC: {settings.bank_ifsc}</Text>}
+                  {settings.gpay_number && <Text style={{ color: '#64748b', fontWeight: 'bold' }}>GPay/UPI: {settings.gpay_number}</Text>}
                 </View>
               ) : null}
             </View>
