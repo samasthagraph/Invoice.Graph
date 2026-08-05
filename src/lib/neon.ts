@@ -41,6 +41,7 @@ export async function runAutoMigrations() {
         advance_payment NUMERIC(12,2) NOT NULL DEFAULT 0.00,
         project_description TEXT,
         notes TEXT,
+        tax_enabled BOOLEAN NOT NULL DEFAULT true,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
       );
     `;
@@ -116,6 +117,7 @@ export async function runAutoMigrations() {
     await sql`ALTER TABLE company_settings ADD COLUMN IF NOT EXISTS account_holder TEXT;`;
     await sql`ALTER TABLE company_settings ADD COLUMN IF NOT EXISTS bank_branch TEXT;`;
     await sql`ALTER TABLE company_settings ADD COLUMN IF NOT EXISTS gpay_number TEXT;`;
+    await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS tax_enabled BOOLEAN NOT NULL DEFAULT true;`;
     
     console.log('Neon DB auto-migrations executed successfully.');
   } catch (err) {

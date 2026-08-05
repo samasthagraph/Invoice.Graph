@@ -309,7 +309,7 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
               styles.documentTitle, 
               { color: isInvoice ? '#4f46e5' : '#d97706' }
             ]}>
-              {isInvoice ? 'Tax Invoice' : 'Quotation'}
+              {isInvoice ? 'Invoice' : 'Quotation'}
             </Text>
             <Text style={styles.metaText}>
               Document #: <Text style={styles.metaValue}>{invoice.document_number}</Text>
@@ -364,10 +364,10 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
         <View style={styles.tableContainer}>
           {/* Table Header */}
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderCell, styles.colDesc]}>Description</Text>
+            <Text style={[styles.tableHeaderCell, { width: invoice.tax_enabled !== false ? '45%' : '55%' }]}>Description</Text>
             <Text style={[styles.tableHeaderCell, styles.colQty]}>Qty</Text>
             <Text style={[styles.tableHeaderCell, styles.colPrice]}>Unit Price</Text>
-            <Text style={[styles.tableHeaderCell, styles.colTax]}>Tax</Text>
+            {invoice.tax_enabled !== false && <Text style={[styles.tableHeaderCell, styles.colTax]}>Tax</Text>}
             <Text style={[styles.tableHeaderCell, styles.colDisc]}>Disc</Text>
             <Text style={[styles.tableHeaderCell, styles.colTotal]}>Amount</Text>
           </View>
@@ -375,10 +375,10 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
           {/* Table Rows */}
           {invoice.items && invoice.items.map((item, idx) => (
             <View style={styles.tableRow} key={item.id || idx} wrap={false}>
-              <Text style={[styles.tableCell, styles.colDesc]}>{item.description}</Text>
+              <Text style={[styles.tableCell, { width: invoice.tax_enabled !== false ? '45%' : '55%' }]}>{item.description}</Text>
               <Text style={[styles.tableCell, styles.colQty]}>{item.quantity}</Text>
               <Text style={[styles.tableCell, styles.colPrice]}>{formatPDFCurrency(item.unit_price)}</Text>
-              <Text style={[styles.tableCell, styles.colTax]}>{item.tax_rate > 0 ? `${item.tax_rate}%` : '0%'}</Text>
+              {invoice.tax_enabled !== false && <Text style={[styles.tableCell, styles.colTax]}>{item.tax_rate > 0 ? `${item.tax_rate}%` : '0%'}</Text>}
               <Text style={[styles.tableCell, styles.colDisc]}>{item.discount_rate > 0 ? `${item.discount_rate}%` : '0%'}</Text>
               <Text style={[styles.tableCell, styles.colTotal]}>{formatPDFCurrency(item.total)}</Text>
             </View>

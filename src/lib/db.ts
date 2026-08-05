@@ -364,7 +364,8 @@ export const db = {
           grand_total: invoice.grand_total,
           advance_payment: invoice.advance_payment || 0,
           project_description: invoice.project_description,
-          notes: invoice.notes
+          notes: invoice.notes,
+          tax_enabled: invoice.tax_enabled !== false
         })
         .select()
         .single();
@@ -443,7 +444,8 @@ export const db = {
           grand_total: invoice.grand_total,
           advance_payment: invoice.advance_payment || 0,
           project_description: invoice.project_description,
-          notes: invoice.notes
+          notes: invoice.notes,
+          tax_enabled: invoice.tax_enabled !== false
         })
         .eq('id', id)
         .select()

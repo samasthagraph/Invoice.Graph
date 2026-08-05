@@ -65,7 +65,7 @@ export default function InvoicePreview({ formData, settings, selectedClient }: I
               <h2 className={`text-2xl font-black uppercase tracking-wider ${
                 isInvoice ? 'text-indigo-600' : 'text-amber-600'
               }`}>
-                {isInvoice ? 'Tax Invoice' : 'Quotation'}
+                {isInvoice ? 'Invoice' : 'Quotation'}
               </h2>
               <div className="text-xs text-slate-500 space-y-1.5 font-medium">
                 <p>
@@ -137,7 +137,7 @@ export default function InvoicePreview({ formData, settings, selectedClient }: I
                   <th className="py-2.5">Item & Description</th>
                   <th className="py-2.5 text-right w-16">Qty</th>
                   <th className="py-2.5 text-right w-24">Unit Price</th>
-                  <th className="py-2.5 text-right w-16">Tax</th>
+                  {formData.tax_enabled !== false && <th className="py-2.5 text-right w-16">Tax</th>}
                   <th className="py-2.5 text-right w-16">Disc</th>
                   <th className="py-2.5 text-right w-28">Total</th>
                 </tr>
@@ -150,7 +150,9 @@ export default function InvoicePreview({ formData, settings, selectedClient }: I
                     </td>
                     <td className="py-3.5 text-right font-bold text-slate-700">{item.quantity}</td>
                     <td className="py-3.5 text-right text-slate-600">{formatCurrency(item.unit_price)}</td>
-                    <td className="py-3.5 text-right text-slate-500">{item.tax_rate > 0 ? `${item.tax_rate}%` : '0%'}</td>
+                    {formData.tax_enabled !== false && (
+                      <td className="py-3.5 text-right text-slate-500">{item.tax_rate > 0 ? `${item.tax_rate}%` : '0%'}</td>
+                    )}
                     <td className="py-3.5 text-right text-slate-500">{item.discount_rate > 0 ? `${item.discount_rate}%` : '0%'}</td>
                     <td className="py-3.5 text-right font-bold text-slate-800">{formatCurrency(item.total)}</td>
                   </tr>

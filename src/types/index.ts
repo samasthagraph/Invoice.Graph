@@ -39,6 +39,7 @@ export interface Invoice {
   advance_payment?: number;
   project_description?: string | null;
   notes?: string | null;
+  tax_enabled?: boolean;
   created_at?: string;
   items?: InvoiceItem[];
 }

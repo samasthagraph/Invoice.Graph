@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     advance_payment NUMERIC(12,2) NOT NULL DEFAULT 0.00,
     project_description TEXT,
     notes TEXT,
+    tax_enabled BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

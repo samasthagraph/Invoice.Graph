@@ -26,7 +26,7 @@ export function formatDate(dateString: string) {
 }
 
 // Calculate totals for a list of items
-export function calculateTotals(items: Omit<InvoiceItem, 'id' | 'invoice_id'>[]) {
+export function calculateTotals(items: Omit<InvoiceItem, 'id' | 'invoice_id'>[], taxEnabled: boolean = true) {
   let subtotal = 0;
   let tax_total = 0;
   let discount_total = 0;
@@ -34,7 +34,7 @@ export function calculateTotals(items: Omit<InvoiceItem, 'id' | 'invoice_id'>[])
   const calculatedItems = items.map(item => {
     const qty = Number(item.quantity) || 0;
     const price = Number(item.unit_price) || 0;
-    const taxRate = Number(item.tax_rate) || 0;
+    const taxRate = taxEnabled ? (Number(item.tax_rate) || 0) : 0;
     const discountRate = Number(item.discount_rate) || 0;
 
     const baseAmount = qty * price;

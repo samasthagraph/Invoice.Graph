@@ -60,6 +60,7 @@ export async function GET(
       advance_payment: Number(row.advance_payment || 0),
       project_description: row.project_description,
       notes: row.notes,
+      tax_enabled: row.tax_enabled !== false,
       created_at: row.created_at,
       items: formattedItems,
       client: {
@@ -104,7 +105,8 @@ export async function PUT(
         grand_total = ${body.grand_total},
         advance_payment = ${Number(body.advance_payment || 0)},
         project_description = ${body.project_description},
-        notes = ${body.notes}
+        notes = ${body.notes},
+        tax_enabled = ${body.tax_enabled !== false}
       WHERE id = ${id}
       RETURNING *
     `;

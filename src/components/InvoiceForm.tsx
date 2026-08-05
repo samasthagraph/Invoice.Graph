@@ -46,7 +46,7 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
 
   // Update totals whenever items change
   useEffect(() => {
-    const { items, subtotal, tax_total, discount_total, grand_total } = calculateTotals(formData.items);
+    const { items, subtotal, tax_total, discount_total, grand_total } = calculateTotals(formData.items, formData.tax_enabled !== false);
     
     // Simple check to prevent infinite loop
     const totalsMatch = 
@@ -64,7 +64,7 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
         grand_total
       }));
     }
-  }, [formData.items, setFormData, formData.subtotal, formData.tax_total, formData.discount_total, formData.grand_total]);
+  }, [formData.items, formData.tax_enabled, setFormData, formData.subtotal, formData.tax_total, formData.discount_total, formData.grand_total]);
 
   // Handle document type toggle
   const handleDocTypeChange = (type: DocumentType) => {
@@ -130,7 +130,7 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
     const item = updated[index];
     const qty = Number(item.quantity) || 0;
     const price = Number(item.unit_price) || 0;
-    const tax = Number(item.tax_rate) || 0;
+    const tax = (formData.tax_enabled !== false) ? (Number(item.tax_rate) || 0) : 0;
     const disc = Number(item.discount_rate) || 0;
 
     const baseAmount = qty * price;
@@ -185,7 +185,7 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
                 : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
-            <span className="text-base">Tax Invoice</span>
+            <span className="text-base">Invoice</span>
             <span className="text-[10px] opacity-75 font-semibold mt-0.5">Generate bill for payment</span>
           </button>
           <button
@@ -201,6 +201,23 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
             <span className="text-[10px] opacity-75 font-semibold mt-0.5">Price quote for bidding</span>
           </button>
         </div>
+      </div>
+
+      {/* Tax Configuration Toggle Switch */}
+      <div className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-200/60 rounded-2xl">
+        <div className="space-y-0.5 pr-4">
+          <h3 className="text-sm font-bold text-slate-800">Apply Tax (GST / VAT)</h3>
+          <p className="text-[11px] text-slate-400 font-medium leading-relaxed">Toggle to include or exclude tax rates on this document.</p>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+          <input 
+            type="checkbox" 
+            checked={formData.tax_enabled !== false}
+            onChange={(e) => setFormData((prev: any) => ({ ...prev, tax_enabled: e.target.checked }))}
+            className="sr-only peer" 
+          />
+          <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+        </label>
       </div>
 
       {/* 2. Metadata: Doc Number & Dates */}
@@ -356,7 +373,7 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
               </div>
 
               {/* Grid values */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className={`grid grid-cols-2 ${formData.tax_enabled !== false ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-3`}>
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Quantity</label>
                   <input
@@ -379,17 +396,19 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
                     className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-800 font-bold focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                 </div>
-                <div>
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Tax (%)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={item.tax_rate}
-                    onChange={(e) => handleItemChange(idx, 'tax_rate', e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-800 font-bold focus:outline-none focus:border-indigo-500 transition-colors"
-                  />
-                </div>
+                {formData.tax_enabled !== false && (
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Tax (%)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={item.tax_rate}
+                      onChange={(e) => handleItemChange(idx, 'tax_rate', e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-800 font-bold focus:outline-none focus:border-indigo-500 transition-colors"
+                    />
+                  </div>
+                )}
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Discount (%)</label>
                   <input
