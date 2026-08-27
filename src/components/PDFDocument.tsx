@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
     color: '#334155',
     backgroundColor: '#ffffff',
   },
-  
+
   // Theme highlights
   invoiceIndicator: {
     height: 4,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#334155',
   },
-  
+
   // Table widths
   colDesc: { width: '45%' },
   colQty: { width: '10%', textAlign: 'right' },
@@ -227,8 +227,14 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     lineHeight: 1.4,
   },
-  termsCol: {
-    width: '48%',
+  termsColLeft: {
+    width: '65%',
+  },
+  termsColRight: {
+    width: '32%',
+  },
+  termsColFull: {
+    width: '100%',
   },
   bankTitle: {
     fontWeight: 'bold',
@@ -287,9 +293,9 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
           {/* Sender company info */}
           <View style={styles.companyDetails}>
             {settings.logo_url ? (
-              <Image 
-                src={settings.logo_url} 
-                style={styles.pdfLogo} 
+              <Image
+                src={settings.logo_url}
+                style={styles.pdfLogo}
               />
             ) : null}
             {settings.company_name ? (
@@ -306,7 +312,7 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
           {/* Doc Metadata details */}
           <View style={styles.documentMeta}>
             <Text style={[
-              styles.documentTitle, 
+              styles.documentTitle,
               { color: isInvoice ? '#4f46e5' : '#d97706' }
             ]}>
               {isInvoice ? 'Invoice' : 'Quotation'}
@@ -412,7 +418,7 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
             ) : null}
             <View style={[
               styles.grandTotalBlock,
-              { 
+              {
                 backgroundColor: isInvoice ? '#e0e7ff' : '#fef3c7',
                 color: isInvoice ? '#312e81' : '#78350f'
               }
@@ -423,7 +429,7 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
             {invoice.advance_payment && Number(invoice.advance_payment) > 0 ? (
               <View style={[
                 styles.grandTotalBlock,
-                { 
+                {
                   backgroundColor: isInvoice ? '#4f46e5' : '#b45309',
                   color: '#ffffff',
                   marginTop: 4
@@ -440,7 +446,7 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
         <View style={styles.footerContainer} wrap={false}>
           <View style={styles.termsBlock}>
             {/* Notes column */}
-            <View style={styles.termsCol}>
+            <View style={invoice.show_bank_details !== false && (settings.bank_name || settings.gpay_number) ? styles.termsColLeft : styles.termsColFull}>
               {invoice.notes ? (
                 <View>
                   <Text style={styles.bankTitle}>Terms & Instructions</Text>
@@ -450,8 +456,8 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
             </View>
 
             {/* Bank details column */}
-            <View style={[styles.termsCol, { alignItems: 'flex-end', textAlign: 'right' }]}>
-              {settings.bank_name || settings.gpay_number ? (
+            {invoice.show_bank_details !== false && (settings.bank_name || settings.gpay_number) ? (
+              <View style={[styles.termsColRight, { alignItems: 'flex-end', textAlign: 'right' }]}>
                 <View>
                   <Text style={styles.bankTitle}>Payment Account Details</Text>
                   {settings.account_holder && <Text style={{ color: '#64748b' }}>Holder: {settings.account_holder}</Text>}
@@ -461,8 +467,8 @@ export default function PDFDocument({ invoice, settings }: PDFDocumentProps) {
                   {settings.bank_ifsc && <Text style={{ color: '#64748b' }}>IFSC: {settings.bank_ifsc}</Text>}
                   {settings.gpay_number && <Text style={{ color: '#64748b', fontWeight: 'bold' }}>GPay/UPI: {settings.gpay_number}</Text>}
                 </View>
-              ) : null}
-            </View>
+              </View>
+            ) : null}
           </View>
 
           <Text style={styles.thankYouText}>Thank you for your business!</Text>

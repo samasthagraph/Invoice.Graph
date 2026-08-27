@@ -39,6 +39,8 @@ function CreateDocumentContent() {
     advance_payment: 0,
     project_description: rentalIdParam ? 'Rental Bill' : '',
     notes: '1. Please pay within 30 days.\n2. Bank Account details listed below.',
+    tax_enabled: true,
+    show_bank_details: true,
     items: descParam ? [
       {
         description: descParam,
@@ -70,9 +72,16 @@ function CreateDocumentContent() {
         const year = new Date().getFullYear();
         const docNumber = `${prefix}-${year}-${randomNum}`;
 
+        const defaultTerms = formData.document_type === 'invoice'
+          ? (compSettings.default_terms_invoice || '1. Please pay within 30 days of invoice issue date.\n2. Payment can be made via Bank Transfer or UPI details listed below.\n3. Late payments may attract standard commercial interest.')
+          : (compSettings.default_terms_quotation || '1. Quotation is valid for 30 days from date of issue.\n2. 50% advance payment required upon order confirmation.\n3. Delivery and execution schedule starts upon receipt of advance.');
+
         setFormData(prev => ({
           ...prev,
           document_number: docNumber,
+          notes: prev.notes === '1. Please pay within 30 days.\n2. Bank Account details listed below.' || !prev.notes
+            ? defaultTerms
+            : prev.notes,
           // Prepopulate client_id if we didn't have it at state initialization but got it now
           client_id: prev.client_id || clientIdParam
         }));

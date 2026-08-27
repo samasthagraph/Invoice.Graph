@@ -46,7 +46,9 @@ export async function POST(req: Request) {
           bank_ifsc = ${body.bank_ifsc},
           account_holder = ${body.account_holder},
           bank_branch = ${body.bank_branch},
-          gpay_number = ${body.gpay_number}
+          gpay_number = ${body.gpay_number},
+          default_terms_invoice = ${body.default_terms_invoice},
+          default_terms_quotation = ${body.default_terms_quotation}
         WHERE id = ${rows[0].id}
         RETURNING *
       `;
@@ -65,7 +67,9 @@ export async function POST(req: Request) {
           bank_ifsc,
           account_holder,
           bank_branch,
-          gpay_number
+          gpay_number,
+          default_terms_invoice,
+          default_terms_quotation
         )
         VALUES (
           ${body.company_name}, 
@@ -79,7 +83,9 @@ export async function POST(req: Request) {
           ${body.bank_ifsc},
           ${body.account_holder},
           ${body.bank_branch},
-          ${body.gpay_number}
+          ${body.gpay_number},
+          ${body.default_terms_invoice},
+          ${body.default_terms_quotation}
         )
         RETURNING *
       `;

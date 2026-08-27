@@ -206,33 +206,31 @@ export default function InvoicePreview({ formData, settings, selectedClient }: I
 
         {/* Footer & Notes Section */}
         <div className="border-t border-slate-100 pt-8 mt-8 space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-[10px] font-medium text-slate-400 leading-relaxed">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 text-[10px] font-medium text-slate-400 leading-relaxed">
             {/* Notes display */}
-            <div>
+            <div className={formData.show_bank_details !== false && (settings.bank_name || settings.gpay_number) ? "sm:col-span-8" : "sm:col-span-12"}>
               {formData.notes && (
                 <>
                   <span className="font-bold uppercase tracking-wider block mb-1 text-slate-400">Terms & Instructions</span>
-                  <p className="whitespace-pre-line text-slate-500">{formData.notes}</p>
+                  <p className="whitespace-pre-line text-slate-500 leading-relaxed">{formData.notes}</p>
                 </>
               )}
             </div>
 
             {/* Bank details prefill */}
-            <div className="sm:text-right">
-              {(settings.bank_name || settings.gpay_number) && (
-                <>
-                  <span className="font-bold uppercase tracking-wider block mb-1 text-slate-400">Payment Account details</span>
-                  <div className="text-slate-500 space-y-0.5 font-semibold">
-                    {settings.account_holder && <p>A/C Holder: {settings.account_holder}</p>}
-                    {settings.bank_name && <p>Bank: {settings.bank_name}</p>}
-                    {settings.bank_branch && <p>Branch: {settings.bank_branch}</p>}
-                    {settings.bank_account_no && <p>A/C No: {settings.bank_account_no}</p>}
-                    {settings.bank_ifsc && <p>IFSC: {settings.bank_ifsc}</p>}
-                    {settings.gpay_number && <p>GPay / UPI: {settings.gpay_number}</p>}
-                  </div>
-                </>
-              )}
-            </div>
+            {formData.show_bank_details !== false && (settings.bank_name || settings.gpay_number) && (
+              <div className="sm:col-span-4 sm:text-right">
+                <span className="font-bold uppercase tracking-wider block mb-1 text-slate-400">Payment Account details</span>
+                <div className="text-slate-500 space-y-0.5 font-semibold">
+                  {settings.account_holder && <p>A/C Holder: {settings.account_holder}</p>}
+                  {settings.bank_name && <p>Bank: {settings.bank_name}</p>}
+                  {settings.bank_branch && <p>Branch: {settings.bank_branch}</p>}
+                  {settings.bank_account_no && <p>A/C No: {settings.bank_account_no}</p>}
+                  {settings.bank_ifsc && <p>IFSC: {settings.bank_ifsc}</p>}
+                  {settings.gpay_number && <p>GPay / UPI: {settings.gpay_number}</p>}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest pt-2">

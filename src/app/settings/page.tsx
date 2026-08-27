@@ -8,7 +8,10 @@ import {
   Check,
   Sparkles,
   Upload,
-  X
+  X,
+  FileText,
+  FileSpreadsheet,
+  RotateCcw
 } from 'lucide-react';
 import { db } from '@/lib/db';
 import { CompanySettings } from '@/types';
@@ -27,7 +30,9 @@ export default function SettingsPage() {
     bank_ifsc: '',
     account_holder: '',
     bank_branch: '',
-    gpay_number: ''
+    gpay_number: '',
+    default_terms_invoice: '',
+    default_terms_quotation: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -324,6 +329,85 @@ export default function SettingsPage() {
                   onChange={handleChange}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-850 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-semibold"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Default Terms & Conditions */}
+          <div className="border-t border-slate-100 pt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+              <h2 className="text-base font-bold text-slate-800 flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-indigo-500" />
+                Default Terms & Instructions
+              </h2>
+              <span className="text-xs text-slate-400 font-medium">
+                These terms will automatically populate when drafting new invoices or quotations.
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Invoice Terms */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
+                    <FileText className="h-3.5 w-3.5 mr-1 text-indigo-500" />
+                    Default Invoice Terms & Instructions
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setSettings(prev => ({
+                      ...prev,
+                      default_terms_invoice: '1. Please pay within 30 days of invoice issue date.\n2. Payment can be made via Bank Transfer or UPI details listed below.\n3. Late payments may attract standard commercial interest.'
+                    }))}
+                    className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center hover:underline cursor-pointer"
+                  >
+                    <RotateCcw className="h-3 w-3 mr-1" />
+                    Reset Default
+                  </button>
+                </div>
+                <textarea
+                  rows={5}
+                  name="default_terms_invoice"
+                  placeholder="e.g. 1. Please pay within 30 days.&#10;2. Goods once sold are not returnable."
+                  value={settings.default_terms_invoice || ''}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-mono leading-relaxed resize-none"
+                />
+                <p className="text-[10px] text-slate-400">
+                  Appears on customer invoices beneath the total amount calculation and next to bank details.
+                </p>
+              </div>
+
+              {/* Quotation Terms */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
+                    <FileSpreadsheet className="h-3.5 w-3.5 mr-1 text-amber-500" />
+                    Default Quotation / Estimate Terms
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setSettings(prev => ({
+                      ...prev,
+                      default_terms_quotation: '1. Quotation is valid for 30 days from date of issue.\n2. 50% advance payment required upon order confirmation.\n3. Delivery and execution schedule starts upon receipt of advance.'
+                    }))}
+                    className="text-[11px] font-bold text-amber-600 hover:text-amber-800 flex items-center hover:underline cursor-pointer"
+                  >
+                    <RotateCcw className="h-3 w-3 mr-1" />
+                    Reset Default
+                  </button>
+                </div>
+                <textarea
+                  rows={5}
+                  name="default_terms_quotation"
+                  placeholder="e.g. 1. Quotation valid for 30 days.&#10;2. 50% advance on approval."
+                  value={settings.default_terms_quotation || ''}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all font-mono leading-relaxed resize-none"
+                />
+                <p className="text-[10px] text-slate-400">
+                  Appears on customer quotations and cost proposals.
+                </p>
               </div>
             </div>
           </div>

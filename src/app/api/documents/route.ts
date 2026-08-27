@@ -36,6 +36,7 @@ export async function GET() {
       project_description: row.project_description,
       notes: row.notes,
       tax_enabled: row.tax_enabled !== false,
+      show_bank_details: row.show_bank_details !== false,
       created_at: row.created_at,
       client: {
         id: row.client_id,
@@ -75,7 +76,8 @@ export async function POST(req: Request) {
         advance_payment,
         project_description, 
         notes,
-        tax_enabled
+        tax_enabled,
+        show_bank_details
       )
       VALUES (
         ${body.document_type}, 
@@ -91,7 +93,8 @@ export async function POST(req: Request) {
         ${Number(body.advance_payment || 0)},
         ${body.project_description}, 
         ${body.notes},
-        ${body.tax_enabled !== false}
+        ${body.tax_enabled !== false},
+        ${body.show_bank_details !== false}
       )
       RETURNING *
     `;

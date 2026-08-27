@@ -34,6 +34,8 @@ export default function EditDocument() {
     advance_payment: 0,
     project_description: '',
     notes: '',
+    tax_enabled: true,
+    show_bank_details: true,
     items: [
       { description: '', quantity: 1, unit_price: 0, tax_rate: 18, discount_rate: 0, total: 0 }
     ]
@@ -69,6 +71,8 @@ export default function EditDocument() {
           advance_payment: Number(doc.advance_payment || 0),
           project_description: doc.project_description || '',
           notes: doc.notes || '',
+          tax_enabled: doc.tax_enabled !== false,
+          show_bank_details: doc.show_bank_details !== false,
           items: doc.items ? doc.items.map(item => ({
             description: item.description,
             quantity: Number(item.quantity),

@@ -40,6 +40,7 @@ export interface Invoice {
   project_description?: string | null;
   notes?: string | null;
   tax_enabled?: boolean;
+  show_bank_details?: boolean;
   created_at?: string;
   items?: InvoiceItem[];
 }
@@ -58,6 +59,8 @@ export interface CompanySettings {
   account_holder?: string | null;
   bank_branch?: string | null;
   gpay_number?: string | null;
+  default_terms_invoice?: string | null;
+  default_terms_quotation?: string | null;
 }
 
 export type AssetStatus = 'available' | 'rented' | 'maintenance';

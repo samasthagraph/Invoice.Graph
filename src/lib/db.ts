@@ -28,7 +28,9 @@ const DEFAULT_SETTINGS: CompanySettings = {
   bank_ifsc: 'SCBL0000123',
   account_holder: 'Acme Innovations Ltd',
   bank_branch: 'Tech City Main',
-  gpay_number: '9876543210'
+  gpay_number: '9876543210',
+  default_terms_invoice: '1. Please pay within 30 days of invoice issue date.\n2. Payment can be made via Bank Transfer or UPI details listed below.\n3. Late payments may attract standard commercial interest.',
+  default_terms_quotation: '1. Quotation is valid for 30 days from date of issue.\n2. 50% advance payment required upon order confirmation.\n3. Delivery and execution schedule starts upon receipt of advance.'
 };
 
 const DEFAULT_CLIENTS: Client[] = [
@@ -365,7 +367,8 @@ export const db = {
           advance_payment: invoice.advance_payment || 0,
           project_description: invoice.project_description,
           notes: invoice.notes,
-          tax_enabled: invoice.tax_enabled !== false
+          tax_enabled: invoice.tax_enabled !== false,
+          show_bank_details: invoice.show_bank_details !== false
         })
         .select()
         .single();
@@ -445,7 +448,8 @@ export const db = {
           advance_payment: invoice.advance_payment || 0,
           project_description: invoice.project_description,
           notes: invoice.notes,
-          tax_enabled: invoice.tax_enabled !== false
+          tax_enabled: invoice.tax_enabled !== false,
+          show_bank_details: invoice.show_bank_details !== false
         })
         .eq('id', id)
         .select()
