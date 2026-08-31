@@ -16,6 +16,7 @@ export async function runAutoMigrations() {
       CREATE TABLE IF NOT EXISTS clients (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         name TEXT NOT NULL,
+        slug TEXT UNIQUE,
         company_name TEXT,
         email TEXT,
         phone TEXT,
@@ -124,6 +125,8 @@ export async function runAutoMigrations() {
     await sql`ALTER TABLE company_settings ADD COLUMN IF NOT EXISTS default_terms_quotation TEXT;`;
     await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS tax_enabled BOOLEAN NOT NULL DEFAULT true;`;
     await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS show_bank_details BOOLEAN NOT NULL DEFAULT true;`;
+    await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS slug TEXT;`;
+    await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_clients_slug ON clients (slug) WHERE slug IS NOT NULL;`;
     
     console.log('Neon DB auto-migrations executed successfully.');
   } catch (err) {

@@ -29,9 +29,11 @@ export async function POST(req: Request) {
     if (!sql) throw new Error('Database connection missing');
     const body = await req.json();
     
+    const slug = body.slug ? body.slug.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '-') : null;
+
     const result = await sql`
-      INSERT INTO clients (name, company_name, email, phone, address)
-      VALUES (${body.name}, ${body.company_name}, ${body.email}, ${body.phone}, ${body.address})
+      INSERT INTO clients (name, slug, company_name, email, phone, address)
+      VALUES (${body.name}, ${slug}, ${body.company_name || null}, ${body.email || null}, ${body.phone || null}, ${body.address || null})
       RETURNING *
     `;
     

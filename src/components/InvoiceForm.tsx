@@ -19,7 +19,7 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [newClient, setNewClient] = useState({
     name: '',
-    company_name: '',
+    slug: '',
     email: '',
     phone: '',
     address: ''
@@ -161,7 +161,7 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
         client_id: savedClient.id
       }));
       setShowAddClientModal(false);
-      setNewClient({ name: '', company_name: '', email: '', phone: '', address: '' });
+      setNewClient({ name: '', slug: '', email: '', phone: '', address: '' });
     } catch (err) {
       console.error('Failed to create client', err);
     } finally {
@@ -299,7 +299,7 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
           <option value="">-- Choose a Client --</option>
           {clients.map(client => (
             <option key={client.id} value={client.id}>
-              {client.company_name ? `${client.company_name} (${client.name})` : client.name}
+              {client.name}
             </option>
           ))}
         </select>
@@ -628,23 +628,39 @@ export default function InvoiceForm({ formData, setFormData, onSave, isSaving }:
             </div>
             <form onSubmit={handleCreateClient} className="p-6 space-y-4">
               <div>
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Contact Name *</label>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Client Name *</label>
                 <input
                   type="text"
                   required
                   value={newClient.name}
-                  onChange={e => setNewClient(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={e => {
+                    const name = e.target.value;
+                    setNewClient(prev => ({
+                      ...prev,
+                      name,
+                      slug: prev.slug ? prev.slug : name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+                    }));
+                  }}
                   className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-850 focus:outline-none focus:border-indigo-500 transition-colors"
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Company / Organization</label>
-                <input
-                  type="text"
-                  value={newClient.company_name}
-                  onChange={e => setNewClient(prev => ({ ...prev, company_name: e.target.value }))}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-850 focus:outline-none focus:border-indigo-500 transition-colors"
-                />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Profile URL Slug</label>
+                  <span className="text-[11px] text-slate-400 font-mono">/clients/{newClient.slug || 'slug'}</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="bg-slate-100 border border-r-0 border-slate-200 rounded-l-lg px-2.5 py-1.5 text-xs text-slate-500 font-mono">
+                    /clients/
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="e.g. markaz"
+                    value={newClient.slug}
+                    onChange={e => setNewClient(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '-') }))}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-r-lg px-3 py-1.5 text-sm text-slate-850 focus:outline-none focus:border-indigo-500 transition-colors font-mono"
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

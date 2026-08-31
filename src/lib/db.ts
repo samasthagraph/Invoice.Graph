@@ -209,6 +209,29 @@ export const db = {
     }
   },
 
+  async getClientById(id: string): Promise<Client | null> {
+    if (usePostgres) {
+      try {
+        return await fetchAPI(`/api/clients/${id}`);
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
+    }
+    if (isSupabaseConfigured && supabase) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      const query = isUuid 
+        ? supabase.from('clients').select('*').or(`id.eq.${id},slug.eq.${id}`)
+        : supabase.from('clients').select('*').eq('slug', id);
+      const { data, error } = await query.single();
+      if (error) return null;
+      return data;
+    } else {
+      const clients = getLocalData<Client[]>('invoice_generator_clients');
+      return clients.find(c => c.id === id || c.slug === id) || null;
+    }
+  },
+
   async saveClient(client: Omit<Client, 'id'>): Promise<Client> {
     if (usePostgres) {
       return fetchAPI('/api/clients', {

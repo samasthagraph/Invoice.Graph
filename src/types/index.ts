@@ -5,6 +5,7 @@ export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'unpaid' | 'expired' | '
 export interface Client {
   id: string;
   name: string;
+  slug?: string | null;
   company_name?: string | null;
   email?: string | null;
   phone?: string | null;

@@ -13,7 +13,9 @@ import {
   Printer,
   ChevronDown,
   Sparkles,
-  Pencil
+  Pencil,
+  Copy,
+  Check
 } from 'lucide-react';
 import { db } from '@/lib/db';
 import { Invoice, CompanySettings, InvoiceStatus } from '@/types';
@@ -94,21 +96,42 @@ export default function DocumentDetail() {
     window.print();
   };
 
+  const [copied, setCopied] = useState(false);
+
+  const getDocShareText = () => {
+    if (!invoice || !settings) return '';
+    const isInvoice = invoice.document_type === 'invoice';
+    const docTypeLabel = isInvoice ? 'Invoice' : 'Quotation';
+    const clientName = invoice.client?.company_name || invoice.client?.name || 'Client';
+    
+    const balanceDue = Number(invoice.grand_total) - Number(invoice.advance_payment || 0);
+    return `Here is ${docTypeLabel} ${invoice.document_number} for ${clientName}.\n` +
+      `Grand Total: Rs. ${Number(invoice.grand_total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}\n` +
+      (Number(invoice.advance_payment || 0) > 0 
+        ? `Balance Due: Rs. ${balanceDue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}\n`
+        : '') +
+      `Due Date: ${new Date(invoice.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}`;
+  };
+
+  const handleCopyShareText = async () => {
+    const text = getDocShareText();
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (err) {
+      console.error('Failed to copy text', err);
+    }
+  };
+
   const handleWhatsAppShare = async () => {
     if (!invoice || !settings) return;
     try {
       setSharing(true);
       const isInvoice = invoice.document_type === 'invoice';
       const docTypeLabel = isInvoice ? 'Invoice' : 'Quotation';
-      const clientName = invoice.client?.company_name || invoice.client?.name || 'Client';
-      
-      const balanceDue = Number(invoice.grand_total) - Number(invoice.advance_payment || 0);
-      const shareText = `Here is ${docTypeLabel} ${invoice.document_number} for ${clientName}.\n` +
-        `Grand Total: Rs. ${Number(invoice.grand_total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}\n` +
-        (Number(invoice.advance_payment || 0) > 0 
-          ? `Balance Due: Rs. ${balanceDue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}\n`
-          : '') +
-        `Due Date: ${new Date(invoice.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}`;
+      const shareText = getDocShareText();
 
       // 1. Try to compile PDF and use Web Share API if supported
       if (typeof navigator !== 'undefined' && navigator.canShare) {
@@ -222,6 +245,9 @@ export default function DocumentDetail() {
             </div>
             <p className="text-xs text-slate-400 font-semibold mt-0.5">
               Type: <span className="capitalize">{invoice.document_type}</span> • Total: {formatCurrency(invoice.grand_total)}
+              {invoice.client && (
+                <> • Client: <Link href={`/clients/${invoice.client.id}`} className="text-indigo-600 hover:underline font-bold">{invoice.client.name}</Link></>
+              )}
             </p>
           </div>
         </div>
@@ -281,19 +307,40 @@ export default function DocumentDetail() {
             Edit Document
           </Link>
 
-          {/* WhatsApp Share Button */}
-          <button
-            onClick={handleWhatsAppShare}
-            disabled={sharing}
-            className="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-600/60 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-emerald-600/10 hover:shadow-emerald-600/20 cursor-pointer disabled:cursor-wait"
-          >
-            {sharing ? (
-              <span className="h-4 w-4 mr-1.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <WhatsAppIcon className="h-4 w-4 mr-1.5 fill-white" />
-            )}
-            {sharing ? 'Compiling...' : 'Share to WhatsApp'}
-          </button>
+          {/* WhatsApp Share & Copy Button Group */}
+          <div className="inline-flex items-center rounded-xl shadow-md shadow-emerald-600/10 border border-emerald-600 overflow-hidden">
+            <button
+              onClick={handleWhatsAppShare}
+              disabled={sharing}
+              className="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-600/60 text-white text-sm font-semibold transition-all cursor-pointer disabled:cursor-wait"
+            >
+              {sharing ? (
+                <span className="h-4 w-4 mr-1.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <WhatsAppIcon className="h-4 w-4 mr-1.5 fill-white" />
+              )}
+              {sharing ? 'Compiling...' : 'Share to WhatsApp'}
+            </button>
+            <button
+              onClick={handleCopyShareText}
+              className={`inline-flex items-center px-3 py-2 text-sm font-semibold transition-all cursor-pointer border-l border-emerald-700 ${
+                copied ? 'bg-emerald-800 text-emerald-200' : 'bg-emerald-700 hover:bg-emerald-800 text-white'
+              }`}
+              title="Copy WhatsApp message text"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4 mr-1 text-emerald-300" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4 mr-1" />
+                  Copy
+                </>
+              )}
+            </button>
+          </div>
 
           {/* Print Button */}
           <button
